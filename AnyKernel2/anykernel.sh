@@ -4,13 +4,13 @@
 ## AnyKernel setup
 # EDIFY properties
 kernel.string="Nethunter kernel"
-do.devicecheck=1
+do.devicecheck=0
 do.initd=1
 do.modules=1
 do.cleanup=1
 device.name1=dogo
-device.name2=
-device.name3=
+device.name2=C5503
+device.name3=C5502
 device.name4=
 device.name5=
 
@@ -49,33 +49,19 @@ dump_boot() {
 write_boot() {
   cd $split_img;
   cmdline=`cat *-cmdline`;
-  board=`cat *-board`;
   base=`cat *-base`;
   pagesize=`cat *-pagesize`;
   kerneloff=`cat *-kerneloff`;
   ramdiskoff=`cat *-ramdiskoff`;
   tagsoff=`cat *-tagsoff`;
-  if [ -f *-second ]; then
-    second=`ls *-second`;
-    second="--second $split_img/$second";
-    secondoff=`cat *-secondoff`;
-    secondoff="--second_offset $secondoff";
-  fi;
   if [ -f /tmp/anykernel/zImage ]; then
     kernel=/tmp/anykernel/zImage;
   else
     kernel=`ls *-zImage`;
     kernel=$split_img/$kernel;
   fi;
-  if [ -f /tmp/anykernel/dtb ]; then
-    dtb="--dt /tmp/anykernel/dtb";
-  elif [ -f *-dtb ]; then
-    dtb=`ls *-dtb`;
-    dtb="--dt $split_img/$dtb";
-  fi;
   cd $ramdisk;
-  find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
-  $bin/mkbootimg --kernel $kernel --ramdisk /tmp/anykernel/ramdisk-new.cpio.gz $second --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff $secondoff --tags_offset $tagsoff $dtb --output /tmp/anykernel/boot-new.img;
+  $bin/mkbootimg --kernel $kernel --ramdisk /tmp/anykernel/split_img/boot.img-ramdisk.gz --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff --tags_offset $tagsoff --output /tmp/anykernel/boot-new.img;
   if [ $? != 0 -o `wc -c < /tmp/anykernel/boot-new.img` -gt `wc -c < /tmp/anykernel/boot.img` ]; then
     ui_print " "; ui_print "Repacking image failed. Aborting...";
     echo 1 > /tmp/anykernel/exitcode; exit;
