@@ -97,6 +97,14 @@ if [ $(getprop ro.product.device) == "bacon" ] || [ $(getprop ro.product.device)
 	chown system:system /data/system/users/0/wallpaper
 fi
 
+# XperiaZR dogo
+
+if [ $(getprop ro.product.device) == "dogo" ]; then
+	cp /tmp/dogowallpaper /data/system/users/0/wallpaper
+	chmod 777 /data/system/users/0/wallpaper
+	chown system:system /data/system/users/0/wallpaper
+fi
+
 # ALL OTHER DEVICES
 #dumpsys window displays | /tmp/busybox/grep/grep init  
 #dumpsys window | /tmp/busybox grep -i "Unrestricted"
