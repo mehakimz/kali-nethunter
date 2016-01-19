@@ -26,13 +26,13 @@ Howto: (*some issues*)
     3. flash the NetHunter zip file to your device (basic and 3rd-party wip apps)
 	reboot > System
 
-(the Anykernel2 script create boot-new.img based on $second offset and it dosn't work on dogo! removing some lines of anykernel.sh make it unable to patch init.usb for HID USB, i'm working on it)
+(the Anykernel2 script create boot-new.img based on $second offset and it dosn't work on dogo! removing some lines of anykernel.sh making it unable to patch init.usb for HID USB, i'm working on it)
 
 	4. run NetHunter > Kali Chroot Manager > install as minimal or full
 (you have a small data partion on your dogo device, it's better to install as minimal image, and of course you can add needed packages in terminal or build-in app scripts)
 
 
-# Support
+# Supports
 Monitor mode for wireless USB adapter chip based on zd1211 & zd1201 & zd100xx & rtl8192cu (like Asus USB-N13 rev. B1)
 For internal wcn3660, i think we need wcn36xx driver (kernel.org wiki on wcn36xx)
 
@@ -41,7 +41,8 @@ For internal wcn3660, i think we need wcn36xx driver (kernel.org wiki on wcn36xx
 Dogo_Info CM wiki page
 https://wiki.cyanogenmod.org/w/Dogo_Info
 
-TWRP for Sony Xperia Z
+TWRP for Sony Xperia ZR
+http://forum.xda-developers.com/showthread.php?t=2653810
 https://twrp.me/devices/sonyxperiaz.html
 
 kernel.org wiki on wcn36xx
