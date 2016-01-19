@@ -1,0 +1,53 @@
+## Nethunter - Mobile Penetration Testing Platform
+
+This is a fork of kali-nethunter project, trying to port for Sony Xperia ZR, known as a dogo.
+
+
+# Synopsis
+To extend the capabilities of your android phone, you need to install CyanogenMod, a free community built distribution of Android, then you can use some special and unique features of Kali Linux on chroot env as Nethunter.
+
+
+# Documentation 
+Read official wiki on "Building NetHunter" and "Porting Kali NetHunter to New Devices"
+https://github.com/offensive-security/kali-nethunter/wiki
+
+
+# Installation
+If you want to try it, there is a zip file named "nethunter-dogo.zip" on /sample
+The kernel configuration is based on _wiki page_ and had some patches for rtlwifi (usb wireless adapter) and mac80211 (as recommended) modules. You can see my cm_kali_dogo_defconfig for kernel configuration. 
+
+Howto: (*some issues*)
+    1. unlocking your device and updating it to CM-12.1 (Dogo_Info CM wiki page)
+
+(the zip file did not signed and CM recovery does not accept it!)
+    2. install TWRP custom recovery for dogo or yuga
+	reboot to recovery
+
+    3. flash the NetHunter zip file to your device (basic and 3rd-party wip apps)
+	reboot > System
+
+(the Anykernel2 script create boot-new.img based on $second offset and it dosn't work on dogo! removing some lines of anykernel.sh make it unable to patch init.usb for HID USB, i'm working on it)
+
+	4. run NetHunter > Kali Chroot Manager > install as minimal or full
+(you have a small data partion on your dogo device, it's better to install as minimal image, and of course you can add needed packages in terminal or build-in app scripts)
+
+
+# Support
+Monitor mode for wireless USB adapter chip based on zd1211 & zd1201 & zd100xx & rtl8192cu (like Asus USB-N13 rev. B1)
+For internal wcn3660, i think we need wcn36xx driver (kernel.org wiki on wcn36xx)
+
+
+# References
+Dogo_Info CM wiki page
+https://wiki.cyanogenmod.org/w/Dogo_Info
+
+TWRP for Sony Xperia Z
+https://twrp.me/devices/sonyxperiaz.html
+
+kernel.org wiki on wcn36xx
+https://wireless.wiki.kernel.org/en/users/Drivers/wcn36xx
+
+Default wlan.ko File Permission
+chown root:root /system/lib/modules/wlan.ko
+chmod 644 /system/lib/modules/*
+
