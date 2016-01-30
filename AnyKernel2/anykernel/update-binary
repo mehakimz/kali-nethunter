@@ -22,7 +22,7 @@ set_perm_recursive() {
   done;
 }
 file_getprop() { grep "^$2" "$1" | cut -d= -f2; }
-getprop() { test -e /sbin/getprop && /sbin/getprop $1 || file_getprop /default.prop $1; }
+getprop() { test -e /system/bin/getprop && /system/bin/getprop $1 || file_getprop /system/build.prop $1; }
 abort() { ui_print "$*"; exit 1; }
 
 mkdir -p /tmp/anykernel;
@@ -75,7 +75,7 @@ if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.initd)" == 1 ]; then
 fi;
 
 ui_print "- Starting kernel installation...";
-/sbin/sh /tmp/anykernel/anykernel.sh;
+/system/bin/sh /tmp/anykernel/anykernel.sh;
 if [ "$(cat /tmp/anykernel/exitcode)" == 1 ]; then 
   umount /system;
   abort;
