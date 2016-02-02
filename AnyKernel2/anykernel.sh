@@ -23,12 +23,13 @@ block=/dev/block/platform/msm_sdcc.1/by-name/boot;
 ## AnyKernel methods (DO NOT CHANGE)
 # set up extracted files and directories
 ramdisk=/tmp/anykernel/ramdisk;
+ramdiskroot=/tmp/anykernel/ramdiskroot;
 bin=/tmp/anykernel/tools;
 split_img=/tmp/anykernel/split_img;
 patch=/tmp/anykernel/patch;
 
 chmod -R 755 $bin;
-mkdir -p $ramdisk $split_img;
+mkdir -p $ramdisk $split_img $ramdiskroot;
 cd $ramdisk;
 
 OUTFD=`ps | grep -v "grep" | grep -oE "update(.*)" | cut -d" " -f3`;
@@ -42,7 +43,12 @@ dump_boot() {
     ui_print " "; ui_print "Dumping/unpacking image failed. Aborting...";
     echo 1 > /tmp/anykernel/exitcode; exit;
   fi;
+  cd $ramdiskroot;
   gunzip -c $split_img/boot.img-ramdisk.gz | cpio -i;
+#we have cpio archive of ramdisk and ramdisk-recovery in dogo
+  cd $ramdisk;
+  cpio -i --no-absolute-filenames --preserve-modification-time < $ramdiskroot/sbin/ramdisk.cpio;
+  rm $ramdiskroot/sbin/ramdisk.cpio;
 }
 
 # repack ramdisk then build and write image
@@ -61,7 +67,12 @@ write_boot() {
     kernel=$split_img/$kernel;
   fi;
   cd $ramdisk;
-  $bin/mkbootimg --kernel $kernel --ramdisk /tmp/anykernel/split_img/boot.img-ramdisk.gz --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff --tags_offset $tagsoff --output /tmp/anykernel/boot-new.img;
+#archive ramdisk as cpio
+  find . | cpio -o > $ramdiskroot/sbin/ramdisk.cpio;
+#make main boot.img-ramdisk.gz with ramdisk and ramdiskrecovery cpio as in
+  cd $ramdiskroot;
+  find . | cpio -H newc -o | gzip > /tmp/anykernel/boot.img-ramdisk.gz;
+  $bin/mkbootimg --kernel $kernel --ramdisk /tmp/anykernel/boot.img-ramdisk.gz --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff --tags_offset $tagsoff --output /tmp/anykernel/boot-new.img;
   if [ $? != 0 -o `wc -c < /tmp/anykernel/boot-new.img` -gt `wc -c < /tmp/anykernel/boot.img` ]; then
     ui_print " "; ui_print "Repacking image failed. Aborting...";
     echo 1 > /tmp/anykernel/exitcode; exit;
@@ -140,6 +151,11 @@ chmod 644 $ramdisk/sbin/media_profiles.xml
 dump_boot;
 
 # begin ramdisk changes
+
+# direct patch ramdisk!!
+# init.environ
+#echo "export TERMINFO /system/etc/terminfo" >> $ramdisk/init.environ.rc;
+#echo "export TERM linux" >> $ramdisk/init.environ.rc;
 
 # adb (un)secure
 backup_file default.prop;
