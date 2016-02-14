@@ -1,3 +1,4 @@
+#!/sbin/sh
 # AnyKernel 2.0 Ramdisk Mod Script 
 # osm0sis @ xda-developers
 
