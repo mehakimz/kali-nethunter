@@ -49,7 +49,7 @@ dump_boot() {
 #we have cpio archive of ramdisk and ramdisk-recovery in dogo
   cd $ramdisk;
   cpio -i --no-absolute-filenames --preserve-modification-time < $ramdiskroot/sbin/ramdisk.cpio;
-  rm $ramdiskroot/sbin/ramdisk.cpio;
+# rm $ramdiskroot/sbin/ramdisk.cpio;
 }
 
 # repack ramdisk then build and write image
@@ -67,13 +67,19 @@ write_boot() {
     kernel=`ls *-zImage`;
     kernel=$split_img/$kernel;
   fi;
+  if [ -f /tmp/anykernel/boot.img-ramdisk.gz ]; then
+    ramd=/tmp/anykernel/boot.img-ramdisk.gz;
+  else
+    ramd=`ls *-ramdisk.gz`;
+    ramd=$split_img/$ramd;
+  fi;
   cd $ramdisk;
 #archive ramdisk as cpio
   find . | cpio -o > $ramdiskroot/sbin/ramdisk.cpio;
 #make main boot.img-ramdisk.gz with ramdisk and ramdiskrecovery cpio as in
   cd $ramdiskroot;
   find . | cpio -H newc -o | gzip > /tmp/anykernel/boot.img-ramdisk.gz;
-  $bin/mkbootimg --kernel $kernel --ramdisk /tmp/anykernel/boot.img-ramdisk.gz --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff --tags_offset $tagsoff --output /tmp/anykernel/boot-new.img;
+  $bin/mkbootimg --kernel $kernel --ramdisk $ramd --cmdline "$cmdline" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff --tags_offset $tagsoff --output /tmp/anykernel/boot-new.img;
   if [ $? != 0 -o `wc -c < /tmp/anykernel/boot-new.img` -gt `wc -c < /tmp/anykernel/boot.img` ]; then
     ui_print " "; ui_print "Repacking image failed. Aborting...";
     echo 1 > /tmp/anykernel/exitcode; exit;
